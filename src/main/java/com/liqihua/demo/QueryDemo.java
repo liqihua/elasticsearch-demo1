@@ -17,6 +17,8 @@ import java.util.concurrent.TimeUnit;
  * @since 2018/4/28
  */
 public class QueryDemo {
+
+
     public static void queryDemo1(){
         SearchRequest request = new SearchRequest();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
