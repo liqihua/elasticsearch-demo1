@@ -1,5 +1,6 @@
 package com.liqihua.demo;
 
+import net.sf.json.JSONObject;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -22,7 +23,14 @@ public class QueryDemo {
     public static final int PORT = 9555;
 
     public static void main(String[] args) {
-        queryDemo1();
+
+        JSONObject matchAll = new JSONObject();
+        JSONObject query = new JSONObject();
+        query.element("match_all",matchAll);
+        JSONObject json = new JSONObject();
+        json.element("query",query);
+        System.out.println(json.toString());
+        queryDemo4(json.toString());
     }
 
     public static void queryDemo1(){
@@ -60,6 +68,22 @@ public class QueryDemo {
         sourceBuilder.from(0);//其实下标
         sourceBuilder.size(3);//返回条数
         sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));//设置查询超时
+        request.source(sourceBuilder);
+        RestHighLevelClient client = getClient();
+        try {
+            SearchResponse response = client.search(request);
+            System.out.println("---"+response.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        closeClient(client);
+    }
+
+
+    public static void queryDemo4(String json){
+        SearchRequest request = new SearchRequest();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.simpleQueryStringQuery(json));
         request.source(sourceBuilder);
         RestHighLevelClient client = getClient();
         try {
