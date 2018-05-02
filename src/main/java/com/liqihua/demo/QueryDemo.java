@@ -8,6 +8,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import sun.applet.Main;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +18,12 @@ import java.util.concurrent.TimeUnit;
  * @since 2018/4/28
  */
 public class QueryDemo {
+    public static final String HOST_NAME = "47.106.100.193";
+    public static final int PORT = 9555;
 
+    public static void main(String[] args) {
+        queryDemo1();
+    }
 
     public static void queryDemo1(){
         SearchRequest request = new SearchRequest();
@@ -31,6 +37,7 @@ public class QueryDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        closeClient(client);
     }
 
     public static void queryDemo2(){
@@ -43,6 +50,7 @@ public class QueryDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        closeClient(client);
     }
 
     public static void queryDemo3(){
@@ -60,6 +68,7 @@ public class QueryDemo {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        closeClient(client);
     }
 
 
@@ -69,7 +78,7 @@ public class QueryDemo {
      * @return
      */
     public static RestHighLevelClient getClient(){
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("120.78.9.212", 9200, "http")));
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost(HOST_NAME, PORT, "http")));
         return client;
     }
 
