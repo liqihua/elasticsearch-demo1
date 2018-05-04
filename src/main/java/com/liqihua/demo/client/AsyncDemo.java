@@ -1,4 +1,4 @@
-package com.liqihua.demo;
+package com.liqihua.demo.client;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
