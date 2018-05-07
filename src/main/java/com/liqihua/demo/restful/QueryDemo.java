@@ -5,34 +5,13 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.junit.Test;
 
-import java.awt.image.RescaleOp;
 
 /**
  * @author liqihua
  * @since 2018/5/4
  */
 public class QueryDemo {
-    //host地址
-    public static final String IP = "47.106.100.193";
-    //端口
-    public static final int PORT = 9555;
-    //请求url
-    public static final String URL = "http://"+IP+":"+PORT;
 
-
-
-
-
-
-    /**
-     * 查出所有index
-     */
-    @Test
-    public void catIndices(){
-        String url = URL+"/_cat/indices?v";
-        System.out.println(url);
-        Tool.get(url);
-    }
 
 
     /**
@@ -48,15 +27,11 @@ public class QueryDemo {
         json.element("query",query);
 
         //索引名，如果值为""，则查出所有index的数据
-        String index = "index_pm_stage_product_1";
+        String index = "index_1";
         //索引名还能使用通配符
         //String index = "index_pm_stage_product*";
 
-        String url = URL+"/"+index+"/_search";
-
-        System.out.println(url);
-        System.out.println(json.toString());
-
+        String url = ESConfig.URL+"/"+index+"/_search";
         Tool.post(json.toString(),url);
     }
 
@@ -81,7 +56,7 @@ public class QueryDemo {
         query.element("multi_match",multi_match);
         json.element("query",query);
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         System.out.println(url);
         System.out.println(json.toString());
@@ -111,7 +86,7 @@ public class QueryDemo {
         query.element("query_string",query_string);
         json.element("query",query);
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         System.out.println(url);
         System.out.println(json.toString());
@@ -141,7 +116,7 @@ public class QueryDemo {
         query.element("term",term);
         json.element("query",query);
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         System.out.println(url);
         System.out.println(json.toString());
@@ -157,27 +132,46 @@ public class QueryDemo {
      * gt − 大于
      * lte − 小于和等于
      * lt − 小于
+     * {"query":{"range":{"product_price":{"gte":"2000"}}}}
      */
     @Test
-    public void range(){
-        //字段名
-        String field = "product_price";
-        //索引名
-        String index = "index_pm_stage_product_1";
+    public void rangeByPrice(){
+        String index = "index_aa";//索引名
+        String field = "product_price";//字段名
 
         JSONObject json = new JSONObject();
         JSONObject query = new JSONObject();
         JSONObject fieldJson = new JSONObject();
         JSONObject scope = new JSONObject();
-        scope.element("gte","1000");
+        scope.element("gte","2000");
         fieldJson.element(field,scope);
         query.element("range",fieldJson);
         json.element("query",query);
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
-        System.out.println(url);
-        System.out.println(json.toString());
+        Tool.post(json.toString(),url);
+    }
+
+
+    /**
+     *
+     */
+    @Test
+    public void rangeByDate(){
+        String index = "index_aa";//索引名
+        String field = "create_on";//字段名
+
+        JSONObject json = new JSONObject();
+        JSONObject query = new JSONObject();
+        JSONObject fieldJson = new JSONObject();
+        JSONObject scope = new JSONObject();
+        scope.element("gt","2017-06-01 16:59:14");
+        fieldJson.element(field,scope);
+        query.element("range",fieldJson);
+        json.element("query",query);
+
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         Tool.post(json.toString(),url);
     }
@@ -200,7 +194,7 @@ public class QueryDemo {
         query.element("type",value);
         json.element("query",query);
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         System.out.println(url);
         System.out.println(json.toString());
@@ -230,7 +224,7 @@ public class QueryDemo {
         //索引名还能使用通配符
         //String index = "index_pm_stage_product*";
 
-        String url = URL+"/"+index+"/_search";
+        String url = ESConfig.URL+"/"+index+"/_search";
 
         System.out.println(url);
         System.out.println(json.toString());
