@@ -22,7 +22,7 @@ public class QueryDemo {
     @Test
     public void match_all(){
         //索引名，如果值为""，则查出所有index的数据
-        String index = "index_1";
+        String index = "index_cc";
         //索引名还能使用通配符
         //String index = "xxx*";
 
