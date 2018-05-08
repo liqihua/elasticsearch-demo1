@@ -1,5 +1,6 @@
 package com.liqihua.demo.restful;
 
+import com.liqihua.config.ESConfig;
 import com.liqihua.utils.Tool;
 import net.sf.json.JSONObject;
 import org.junit.Test;

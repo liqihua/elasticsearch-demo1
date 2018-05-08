@@ -1,4 +1,4 @@
-package com.liqihua.demo.restful;
+package com.liqihua.config;
 
 /**
  * @author liqihua

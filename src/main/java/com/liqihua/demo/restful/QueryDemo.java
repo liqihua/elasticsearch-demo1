@@ -1,5 +1,6 @@
 package com.liqihua.demo.restful;
 
+import com.liqihua.config.ESConfig;
 import com.liqihua.utils.Tool;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -20,20 +21,41 @@ public class QueryDemo {
      */
     @Test
     public void match_all(){
+        //索引名，如果值为""，则查出所有index的数据
+        String index = "index_1";
+        //索引名还能使用通配符
+        //String index = "xxx*";
+
         JSONObject json = new JSONObject();
         JSONObject query = new JSONObject();
         JSONObject match_all = new JSONObject();
         query.element("match_all",match_all);
         json.element("query",query);
 
-        //索引名，如果值为""，则查出所有index的数据
-        String index = "index_1";
-        //索引名还能使用通配符
-        //String index = "index_pm_stage_product*";
-
         String url = ESConfig.URL+"/"+index+"/_search";
         Tool.post(json.toString(),url);
     }
+
+
+    @Test
+    public void sort(){
+        String index = "index_1";
+
+        JSONObject data = new JSONObject();
+        JSONObject query = new JSONObject();
+        JSONObject match_all = new JSONObject();
+        JSONObject sort = new JSONObject();
+        JSONObject order = new JSONObject();
+        order.element("order","desc");
+        sort.element("create_on",order);
+        query.element("match_all",match_all);
+        data.element("query",query);
+        data.element("sort",sort);
+
+        String url = ESConfig.URL+"/"+index+"/_search";
+        Tool.post(data.toString(),url);
+    }
+
 
 
     /**
@@ -136,7 +158,7 @@ public class QueryDemo {
      */
     @Test
     public void rangeByPrice(){
-        String index = "index_aa";//索引名
+        String index = "index_ee";//索引名
         String field = "product_price";//字段名
 
         JSONObject json = new JSONObject();
