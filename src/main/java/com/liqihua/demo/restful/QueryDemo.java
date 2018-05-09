@@ -22,7 +22,7 @@ public class QueryDemo {
     @Test
     public void match_all(){
         //索引名，如果值为""，则查出所有index的数据
-        String index = "index_cc";
+        String index = "index_1";
         //索引名还能使用通配符
         //String index = "xxx*";
 
@@ -37,8 +37,12 @@ public class QueryDemo {
     }
 
 
+    /**
+     * 排序
+     * {"query":{"match_all":{}},"sort":{"create_on":{"order":"desc"}}}
+     */
     @Test
-    public void sort(){
+    public void match_all_sort(){
         String index = "index_1";
 
         JSONObject data = new JSONObject();
@@ -57,32 +61,106 @@ public class QueryDemo {
     }
 
 
+    /**
+     * match查询
+     * 查询匹配就会进行分词，比如"宝马多少马力"会被分词为"宝马 多少 马力", 所有有关"宝马 多少 马力", 那么所有包
+     * 含这三个词中的一个或多个的文档就会被搜索出来，文档"我的保时捷马力不错"也会被搜索出来
+     * {"query":{"match":{"product_type":{"query":"新款系带气垫缓震运动鞋"}}}}
+     */
+    @Test
+    public void match(){
+        String index = "index_1";
+        String field = "product_name";
+        String keyword = "新款系带气垫缓震运动鞋";
+
+        JSONObject data = new JSONObject();
+        JSONObject query = new JSONObject();
+        JSONObject match = new JSONObject();
+        JSONObject content = new JSONObject();
+        content.element("query",keyword);
+        match.element(field,content);
+        query.element("match",match);
+        data.element("query",query);
+
+        String url = ESConfig.URL+"/"+index+"/_search";
+        Tool.post(data.toString(),url);
+    }
+
+
+
+    /**
+     * match_phrase查询
+     * 在match中"宝马多少马力"会被分词为"宝马 多少 马力"，"我的保时捷马力不错"也会被搜索出来，
+     * 想要精确匹配所有同时包含"宝马 多少 马力"的文档，就需要使用match_phrase
+     * {"query":{"match_phrase":{"product_name":{"query":"Nike 新款系带气垫缓震运动鞋"}}}}
+     */
+    @Test
+    public void match_phrase(){
+        String index = "index_1";
+        String field = "product_name";
+        String keyword = "Nike 新款系带气垫缓震运动鞋";
+
+        JSONObject data = new JSONObject();
+        JSONObject query = new JSONObject();
+        JSONObject match_phrase = new JSONObject();
+        JSONObject content = new JSONObject();
+        content.element("query",keyword);
+        match_phrase.element(field,content);
+        query.element("match_phrase",match_phrase);
+        data.element("query",query);
+
+        String url = ESConfig.URL+"/"+index+"/_search";
+        Tool.post(data.toString(),url);
+
+    }
+
+
 
     /**
      * multi_match查询
      * 将文本或短语与多个字段匹配
-     * {"query":{"multi_match":{"query":"11","fields":["create_by","op_by"]}}}
+     * 查询create_by或op_by符合关键词的doc
+     * {"query":{"multi_match":{"query":"运动鞋","fields":["product_type","product_name"]}}}
      */
     @Test
     public void multi_match(){
-        //关键词
-        String keyword = "11";
-        //索引名
-        String index = "index_pm_stage_product";
+        String index = "index_1";
+        String[] fields = new String[]{"product_type","product_name"};
+        String keyword = "运动鞋";
 
         JSONObject json = new JSONObject();
         JSONObject query = new JSONObject();
         JSONObject multi_match = new JSONObject();
         multi_match.element("query",keyword);
-        multi_match.element("fields",new String[]{"create_by","op_by"});
+        multi_match.element("fields",fields);
         query.element("multi_match",multi_match);
         json.element("query",query);
 
         String url = ESConfig.URL+"/"+index+"/_search";
+        Tool.post(json.toString(),url);
+    }
 
-        System.out.println(url);
-        System.out.println(json.toString());
 
+
+    /**
+     * term查询
+     * term是代表完全匹配，即不进行分词器分析，文档中必须包含整个搜索的词汇
+     * {"query":{"term":{"product_type":"护肤"}}}
+     */
+    @Test
+    public void term(){
+        String index = "index_1";
+        String field = "product_sku";
+        String value = "151160010137";
+
+        JSONObject json = new JSONObject();
+        JSONObject query = new JSONObject();
+        JSONObject term = new JSONObject();
+        term.element(field,value);
+        query.element("term",term);
+        json.element("query",query);
+
+        String url = ESConfig.URL+"/"+index+"/_search";
         Tool.post(json.toString(),url);
     }
 
@@ -96,10 +174,8 @@ public class QueryDemo {
      */
     @Test
     public void query_string(){
-        //关键词
+        String index = "index_1";
         String keyword = "新款";
-        //索引名
-        String index = "index_pm_stage_product";
 
         JSONObject json = new JSONObject();
         JSONObject query = new JSONObject();
@@ -109,42 +185,11 @@ public class QueryDemo {
         json.element("query",query);
 
         String url = ESConfig.URL+"/"+index+"/_search";
-
-        System.out.println(url);
-        System.out.println(json.toString());
-
         Tool.post(json.toString(),url);
     }
 
 
-    /**
-     * 期限等级查询
-     * 这些查询主要处理结构化数据，如数字，日期和枚举
-     * {"query":{"term":{"product_id":"1000054193"}}}
-     */
-    @Test
-    public void term(){
-        //字段名
-        String field = "product_id";
-        //字段值
-        String value = "1000054193";
-        //索引名
-        String index = "index_pm_stage_product";
 
-        JSONObject json = new JSONObject();
-        JSONObject query = new JSONObject();
-        JSONObject term = new JSONObject();
-        term.element(field,value);
-        query.element("term",term);
-        json.element("query",query);
-
-        String url = ESConfig.URL+"/"+index+"/_search";
-
-        System.out.println(url);
-        System.out.println(json.toString());
-
-        Tool.post(json.toString(),url);
-    }
 
 
     /**

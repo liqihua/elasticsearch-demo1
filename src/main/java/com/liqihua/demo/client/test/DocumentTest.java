@@ -56,4 +56,36 @@ public class DocumentTest {
 
 
 
+    @Test
+    public void bulkAdd(){
+        String index = "index_cc";
+        String type = "user";
+        int IdStart = 10;
+        int IdEnd = 20;
+        DocumentDemo.bulkAdd(index,type,IdStart,IdEnd);
+    }
+
+
+    @Test
+    public void bulkDelete(){
+        String index = "index_cc";
+        String type = "user";
+        int IdStart = 10;
+        int IdEnd = 20;
+        DocumentDemo.bulkDelete(index,type,IdStart,IdEnd);
+    }
+
+
+    @Test
+    public void bulkUpdate(){
+        String index = "index_cc";
+        String type = "user";
+        int IdStart = 10;
+        int IdEnd = 20;
+        DocumentDemo.bulkUpdate(index,type,IdStart,IdEnd);
+    }
+
+
+
+
 }
