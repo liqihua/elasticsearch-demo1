@@ -2,18 +2,20 @@ package com.liqihua.demo.client;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+
+import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+
 
 /**
  * @author liqihua
@@ -39,8 +41,33 @@ public class QueryDemo {
     }
 
 
+
     @Test
-    public void termQuery(){
+    public void sort(){
+        SearchRequest request = new SearchRequest();
+        request.indices("index_1");//指定index
+        request.types("product");//指定type
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(matchQuery("product_name","Nike 新款系带气垫缓震运动鞋"));
+        sourceBuilder.from(2);
+        sourceBuilder.size(2);
+        sourceBuilder.sort("create_on", SortOrder.DESC);
+        request.source(sourceBuilder);
+        try {
+            SearchResponse response = ESClient.client.search(request);
+            for(SearchHit hit : response.getHits().getHits()){
+                System.out.println(hit.getSourceAsString());
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Test
+    public void term(){
         String field = "product_sku";
         String value = "151160010137";
 
@@ -63,11 +90,11 @@ public class QueryDemo {
     @Test
     public void match(){
         String field = "product_name";
-        String keyword = "新款系带气垫缓震运动鞋";
+        String keyword = "Nike 新款系带气垫缓震运动鞋";
 
         SearchRequest request = new SearchRequest();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(QueryBuilders.matchQuery(field,keyword));
+        sourceBuilder.query(matchQuery(field,keyword));
         request.source(sourceBuilder);
         try {
             SearchResponse response = ESClient.client.search(request);
@@ -78,6 +105,47 @@ public class QueryDemo {
     }
 
 
+
+
+    @Test
+    public void scroll(){
+        String index = "index_1";
+        String field = "product_name";
+        String keyword = "Nike 新款系带气垫缓震运动鞋";
+        try {
+            final Scroll scroll = new Scroll(TimeValue.timeValueMinutes(1L));
+            SearchRequest searchRequest = new SearchRequest(index);
+            searchRequest.scroll(scroll);
+            SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+            sourceBuilder.query(matchQuery(field, keyword));
+            sourceBuilder.sort("create_on", SortOrder.DESC);
+            //sourceBuilder.size(2);
+            searchRequest.source(sourceBuilder);
+
+            SearchResponse response = ESClient.client.search(searchRequest);
+            String scrollId = response.getScrollId();
+            SearchHit[] searchHits = response.getHits().getHits();
+            int total = searchHits.length;
+            while (searchHits != null && searchHits.length > 0) {
+                total += searchHits.length;
+                SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
+                scrollRequest.scroll(scroll);
+                response = ESClient.client.searchScroll(scrollRequest);
+                scrollId = response.getScrollId();
+                searchHits = response.getHits().getHits();
+                for(SearchHit hit : searchHits){
+                    System.out.println(hit.getSourceAsString());
+                }
+            }
+            System.out.println("total:"+total);
+            /*ClearScrollRequest clearScrollRequest = new ClearScrollRequest();
+            clearScrollRequest.addScrollId(scrollId);
+            ClearScrollResponse clearScrollResponse = ESClient.client.clearScroll(clearScrollRequest);
+            boolean succeeded = clearScrollResponse.isSucceeded();*/
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
