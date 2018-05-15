@@ -18,6 +18,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,6 +115,29 @@ public class DocumentDemo {
             IndexRequest doc = new IndexRequest(index,type,i+"");
             doc.source("name","name"+i,"age",10+i,"create_date",new Date());
             request.add(doc);
+        }
+        try {
+            BulkResponse response = ESClient.client.bulk(request);
+            jsonPrint(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 批量添加
+     * @param index
+     * @param type
+     * @param list
+     */
+    public static void bulkAdd(String index,String type,List<Map<String,Object>> list){
+        BulkRequest request = new BulkRequest();
+        int id = 0;
+        for(Map<String,Object> map : list){
+            IndexRequest doc = new IndexRequest(index,type,id+"");
+            doc.source(map);
+            request.add(doc);
+            id += 1;
         }
         try {
             BulkResponse response = ESClient.client.bulk(request);

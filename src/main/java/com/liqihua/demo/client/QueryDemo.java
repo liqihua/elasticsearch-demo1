@@ -27,8 +27,8 @@ public class QueryDemo {
     @Test
     public void matchAllQuery(){
         SearchRequest request = new SearchRequest();
-        //request.indices("");//指定index
-        //request.types("");//指定type
+        request.indices("index_user");//指定index
+        request.types("user");//指定type
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.query(QueryBuilders.matchAllQuery());
         request.source(sourceBuilder);

@@ -3,9 +3,7 @@ package com.liqihua.demo.client.test;
 import com.liqihua.demo.client.DocumentDemo;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author liqihua
@@ -57,12 +55,17 @@ public class DocumentTest {
 
 
     @Test
-    public void bulkAdd(){
-        String index = "index_cc";
+    public void bulkAddUser(){
+        String index = "index_user";
         String type = "user";
-        int IdStart = 10;
-        int IdEnd = 20;
-        DocumentDemo.bulkAdd(index,type,IdStart,IdEnd);
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        for(int i=0; i<10; i++){
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("name","name"+i);
+            map.put("age",20+i);
+            list.add(map);
+        }
+        DocumentDemo.bulkAdd(index,type,list);
     }
 
 

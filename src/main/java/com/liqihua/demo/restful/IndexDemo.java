@@ -14,6 +14,7 @@ public class IndexDemo {
 
     /**
      * 查出所有index
+     * http://ip:port/_cat/indices?v
      */
     @Test
     public void catIndices(){
@@ -24,10 +25,11 @@ public class IndexDemo {
 
     /**
      * 添加索引
+     * http://port:ip/indexName
      */
     @Test
     public void create(){
-        String index = "index_aa";
+        String index = "index_order";
         String url = ESConfig.URL + "/" + index;
         Tool.put(null,url);
     }
@@ -38,10 +40,11 @@ public class IndexDemo {
     /**
      * 删除index
      * 如果索引不存在返回404
+     * http://ip:port/indexName
      */
     @Test
     public void delete(){
-        String index = "index_aa";
+        String index = "index_user";
         String url = ESConfig.URL + "/" + index;
         Tool.delete(url);
     }
@@ -50,6 +53,7 @@ public class IndexDemo {
     /**
      * 判断index是否存在
      * The HTTP status code indicates if the index exists or not. A 404 means it does not exist, and 200 means it does.
+     * http://ip:port/indexName
      */
     @Test
     public void exist(){
@@ -68,11 +72,13 @@ public class IndexDemo {
 
     /**
      * 添加索引同时设置mapping
+     * http://ip:port/indexName
+     * {"mappings":{"product":{"numeric_detection":"true","date_detection":"true","dynamic_date_formats":"yyyy-MM-dd HH:mm:ss"}}}
      */
     @Test
     public void createWithMapping(){
-        String index = "index_aa";
-        String type = "product";
+        String index = "index_user";
+        String type = "user";
         String url = ESConfig.URL + "/" + index;
 
         JSONObject data = new JSONObject();
@@ -92,11 +98,13 @@ public class IndexDemo {
      * 给索引的新字段设置mapping（字段类型）
      * 索引必须已存在，否则返回404
      * 字段必须不存在，否则返回400
+     * http://ip:port/indexName/_mapping/typeName
+     * {"properties":{"age":{"type":"double"}}}
      */
     @Test
     public void addFieldMapping(){
-        String index = "index_aa";//index名
-        String type = "user";//type名
+        String index = "index_1";//index名
+        String type = "product";//type名
 
         String url = ESConfig.URL + "/" + index + "/_mapping/" + type;
 
@@ -114,23 +122,39 @@ public class IndexDemo {
 
     /**
      * 查询字段类型
+     * http://ip:port/index_1/_mapping/typeName
      */
     @Test
-    public void getMapping(){
+    public void getTypeMapping(){
         //查某个index的所有字段类型
-        String index = "index_bb";
-        String url = ESConfig.URL + "/" + index + "/_mapping";
-        Tool.get(url);
-        //查询某个字段的类型
+        String index = "index_1";
         String type = "product";
-        String field = "create_on";
-        url = url + "/" + type + "/field/" + field;
+        String url = ESConfig.URL + "/" + index + "/_mapping/" + type;
         Tool.get(url);
     }
 
 
     /**
+     * 查询某个字段的类型
+     * http://ip:port/index_1/_mapping/typeName/field/fieldName
+     */
+    @Test
+    public void getFieldMapping(){
+        //查某个index的所有字段类型
+        String index = "index_1";
+        String type = "product";
+        String field = "create_on";
+        String url = ESConfig.URL + "/" + index + "/_mapping/" + type + "/field/" + field;
+        Tool.get(url);
+    }
+
+
+
+
+
+    /**
      * 判断type是否存在
+     * http://ip:port/indexName/_mapping/typeName
      */
     @Test
     public void typeExist(){
@@ -146,7 +170,12 @@ public class IndexDemo {
     }
 
 
-
+    /**
+     * 重建索引：
+     * 新建一个索引，把旧索引的数据同步过去新索引
+     * http://ip:port/_reindex
+     * {"source":{"index":"index_bb"},"dest":{"index":"index_aa"}}
+     */
     @Test
     public void reIndex(){
         String sourceIndex = "index_bb";
@@ -162,6 +191,20 @@ public class IndexDemo {
         String url = ESConfig.URL + "/_reindex";
         Tool.post(data.toString(),url);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
