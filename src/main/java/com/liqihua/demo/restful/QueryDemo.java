@@ -222,7 +222,7 @@ public class QueryDemo {
 
 
     /**
-     *
+     * {"query":{"range":{"create_on":{"gt":"2017-06-01 16:59:14"}}}}
      */
     @Test
     public void rangeByDate(){
@@ -246,6 +246,7 @@ public class QueryDemo {
 
     /**
      * 类型查询 - 具有特定类型的文档
+     * {"query":{"type":{"value":"pm_stage_product"}}}
      */
     @Test
     public void type(){
@@ -271,58 +272,6 @@ public class QueryDemo {
 
 
 
-
-
-
-
-
-
-
-    @Test
-    public void convert(){
-        JSONObject json = new JSONObject();
-        JSONObject query = new JSONObject();
-        JSONObject match_all = new JSONObject();
-        query.element("match_all",match_all);
-        json.element("query",query);
-
-        //索引名，如果值为""，则查出所有index的数据
-        String index = "index_pm_stage_product";
-        //索引名还能使用通配符
-        //String index = "index_pm_stage_product*";
-
-        String url = ESConfig.URL+"/"+index+"/_search";
-
-        System.out.println(url);
-        System.out.println(json.toString());
-
-        String result = Tool.post(json.toString(),url);
-        JSONObject resultJson = JSONObject.fromObject(result);
-        JSONObject hits = resultJson.getJSONObject("hits");
-        JSONArray hitsArr = hits.getJSONArray("hits");
-        System.out.println(hitsArr.toString());
-        for(int i=0; i<hitsArr.size(); i++){
-            boolean update = false;
-            JSONObject product = hitsArr.getJSONObject(i).getJSONObject("_source");
-            String product_price = product.getString("product_price");
-            if(Tool.isNumber(product_price)){
-                product.element("product_price",Integer.parseInt(product_price));
-                update = true;
-            }
-            if(Tool.isDouble(product_price)){
-                product.element("product_price",Double.parseDouble(product_price));
-                update = true;
-            }
-            if(update){
-                String id = hitsArr.getJSONObject(i).getString("_id");
-                System.out.println("update:"+product.toString());
-                //String updateResult = Tool.put(product.toString(),URL+"/"+index+"/pm_stage_product/"+id);
-                //System.out.println("updateResult:"+updateResult);
-            }
-        }
-        System.out.println(hitsArr.toString());
-
-    }
 
 
 

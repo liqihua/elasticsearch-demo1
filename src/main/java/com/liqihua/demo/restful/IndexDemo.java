@@ -44,7 +44,7 @@ public class IndexDemo {
      */
     @Test
     public void delete(){
-        String index = "index_user";
+        String index = "index_order";
         String url = ESConfig.URL + "/" + index;
         Tool.delete(url);
     }

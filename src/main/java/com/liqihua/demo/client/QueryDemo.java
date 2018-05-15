@@ -2,8 +2,10 @@ package com.liqihua.demo.client;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.*;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
@@ -14,7 +16,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
 
 
 /**
@@ -48,7 +49,7 @@ public class QueryDemo {
         request.indices("index_1");//指定index
         request.types("product");//指定type
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(matchQuery("product_name","Nike 新款系带气垫缓震运动鞋"));
+        sourceBuilder.query(QueryBuilders.matchQuery("product_name","Nike 新款系带气垫缓震运动鞋"));
         sourceBuilder.from(2);
         sourceBuilder.size(2);
         sourceBuilder.sort("create_on", SortOrder.DESC);
@@ -94,7 +95,7 @@ public class QueryDemo {
 
         SearchRequest request = new SearchRequest();
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-        sourceBuilder.query(matchQuery(field,keyword));
+        sourceBuilder.query(QueryBuilders.matchQuery(field,keyword));
         request.source(sourceBuilder);
         try {
             SearchResponse response = ESClient.client.search(request);
@@ -117,7 +118,7 @@ public class QueryDemo {
             SearchRequest searchRequest = new SearchRequest(index);
             searchRequest.scroll(scroll);
             SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
-            sourceBuilder.query(matchQuery(field, keyword));
+            sourceBuilder.query(QueryBuilders.matchQuery(field, keyword));
             sourceBuilder.sort("create_on", SortOrder.DESC);
             //sourceBuilder.size(2);
             searchRequest.source(sourceBuilder);
@@ -142,6 +143,34 @@ public class QueryDemo {
             clearScrollRequest.addScrollId(scrollId);
             ClearScrollResponse clearScrollResponse = ESClient.client.clearScroll(clearScrollRequest);
             boolean succeeded = clearScrollResponse.isSucceeded();*/
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    @Test
+    public void nestedQuery(){
+        SearchRequest request = new SearchRequest();
+        request.indices("index_article");//指定index
+        request.types("article");//指定type
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        QueryBuilder builder = QueryBuilders.boolQuery()
+                .must(QueryBuilders.matchQuery("title","eggs"))
+                .must(QueryBuilders.nestedQuery("comments",
+                        QueryBuilders.boolQuery()
+                        .must(QueryBuilders.matchQuery("comments.name","john"))
+                        ,ScoreMode.Avg));
+        System.out.println("---data:"+builder.toString());
+        sourceBuilder.query(builder);
+        request.source(sourceBuilder);
+        try {
+            SearchResponse response = ESClient.client.search(request);
+            for(SearchHit hit : response.getHits().getHits()){
+                System.out.println(hit.getSourceAsString());
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

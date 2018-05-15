@@ -1,10 +1,18 @@
 package com.liqihua.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.springframework.util.ClassUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -275,6 +283,147 @@ public class Tool {
             return true;
         }
         return false;
+    }
+
+
+    /**
+     * 判断一个String的值在不在可变参数里面,如果不在里面，就返回true
+     * @param str
+     * @param strs
+     * @return
+     */
+    public static boolean notIn(String str,String ... strs){
+        for(String s : strs){
+            if(s.equals(str)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 方法名：getFileSuffix
+     * 详述：获取文件后缀，包含.
+     * @param file
+     * @return
+     */
+    public static String getFileSuffix(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        if(!fileName.contains(".")){
+            return null;
+        }
+        String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+        return suffix;
+    }
+
+
+    /**
+     * MultipartFile转File
+     * @param file
+     * @return
+     */
+    public static File toFile(MultipartFile file){
+        if(file != null && file.getSize()>0){
+            try {
+                String fileName = file.getOriginalFilename();
+                if (!fileName.contains(".")) {
+                    return null;
+                }
+                String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+                String newFileName = UUID.randomUUID().toString().replace("-", "") + System.currentTimeMillis() + suffix;
+                String saveDirStr = getProjectPath() + "tmpFile/";
+                File saveDir = new File(saveDirStr);
+                saveDir.mkdirs();
+                File newFile = new File(saveDirStr, newFileName);
+                newFile.createNewFile();
+                file.transferTo(newFile);
+                return newFile;
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * 获取项目磁盘路径
+     */
+    public static String getProjectPath() {
+        String path = ClassUtils.getDefaultClassLoader().getResource("").getPath();
+        if(path.contains("!")) {
+            path = path.substring(0, path.indexOf("!"));
+            path = path.replace("file:", "");
+            path = path.substring(0,path.lastIndexOf("/")+1);
+        }else {
+            path = path.substring(1);
+            path = path.replace("classes/", "");
+        }
+        return path;
+    }
+
+
+    /**
+     * 读取XSSFCell返回String
+     * @param cell
+     * @return
+     */
+    public static String getExcelValue(XSSFCell cell) {
+        if(cell != null && cell.getCellType() != XSSFCell.CELL_TYPE_BLANK) {
+            String value = null;
+            if(cell.getCellType() == XSSFCell.CELL_TYPE_STRING){
+                value = cell.getStringCellValue();
+            }else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+                if(HSSFDateUtil.isCellDateFormatted(cell)) {
+                    value = Tool.formatDate(cell.getDateCellValue(), null);
+                }else {
+                    value = Tool.double2String(cell.getNumericCellValue(), null);
+                    value = value.replace(".00","");
+                }
+            }else {
+                return "-1";
+            }
+            return value;
+        }
+        return null;
+
+    }
+
+
+    /**
+     * 把Date对象格式化成String对象
+     * @param date
+     * @param format 传null默认为 yyyy-MM-dd HH:mm:ss
+     * @return
+     */
+    public static String formatDate(Date date, String format){
+        SimpleDateFormat sf = null;
+        if(Tool.isBlank(format)){
+            sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }else{
+            sf = new SimpleDateFormat(format);
+        }
+        return sf.format(date);
+    }
+
+
+    /**
+     * 方法名：double2String
+     * 详述：使转化得到的str不是科学计数法，如：4.3062319920812602E17->43062319920812602.00
+     * @param d
+     * @param pattern
+     * @return
+     */
+    public static String double2String(Double d,String pattern){
+        if(d != null){
+            if(isBlank(pattern)){
+                pattern = "0.00";
+            }
+            DecimalFormat df = new DecimalFormat(pattern);
+            return df.format(d);
+        }
+        return null;
     }
 
 
