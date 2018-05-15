@@ -25,6 +25,11 @@ public class ExcelController {
         return "--test1--";
     }
 
+    /**
+     * 读取excel示例
+     * @param file
+     * @return
+     */
     @RequestMapping(value = "/readFromExcel", method = RequestMethod.POST)
     public String readFromExcel(MultipartFile file){
         if(file != null && file.getSize() > 0){
@@ -64,6 +69,42 @@ public class ExcelController {
     }
 
 
+
+    @RequestMapping(value = "/excelToIndex", method = RequestMethod.POST)
+    public String excelToIndex(MultipartFile file){
+        if(file != null && file.getSize() > 0){
+            String suffix = Tool.getFileSuffix(file);
+            if(Tool.notIn(suffix, ".xls",".xlsx")) {
+                return "文件后缀必须是xls或者xlsx";
+            }
+
+            // 读取上传的excel文件
+            File f = Tool.toFile(file);
+            if(f == null){
+                return "函数toFile发生错误";
+            }
+            try {
+                XSSFWorkbook workbook = new XSSFWorkbook(f);
+                XSSFSheet sheet = workbook.getSheetAt(0);
+                if(sheet != null) {
+                    for(int r=0;r<=sheet.getLastRowNum();r++){
+                        XSSFRow row = sheet.getRow(r);
+                        if(row != null) {
+                            for(int c=0;c<row.getLastCellNum();c++) {
+                                XSSFCell cell = row.getCell(c);
+                                String value = Tool.getExcelValue(cell);
+                                System.out.print(value+" ("+c+")| ");
+                            }
+                            System.out.println("--- : "+r);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "-- readFromExcel --";
+    }
 
 
 }
