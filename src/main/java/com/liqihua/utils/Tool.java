@@ -1,5 +1,6 @@
 package com.liqihua.utils;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -424,6 +425,18 @@ public class Tool {
             return df.format(d);
         }
         return null;
+    }
+
+
+
+    /**
+     * 打印对象
+     * @param obj
+     */
+    public static String jsonPrint(Object obj){
+        String str = JSONObject.fromObject(obj).toString();
+        System.out.println(str);
+        return str;
     }
 
 

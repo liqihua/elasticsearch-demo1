@@ -1,5 +1,6 @@
 package com.liqihua.demo.client;
 
+import com.liqihua.utils.Tool;
 import net.sf.json.JSONObject;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.alias.Alias;
@@ -36,7 +37,7 @@ public class IndexDemo {
         CreateIndexRequest request = new CreateIndexRequest(index);
         try {
             CreateIndexResponse response = ESClient.client.indices().create(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,7 +57,7 @@ public class IndexDemo {
         request.mapping(type,map);
         try {
             CreateIndexResponse response = ESClient.client.indices().create(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,7 +74,7 @@ public class IndexDemo {
         request.alias(new Alias(alias));
         try {
             CreateIndexResponse response = ESClient.client.indices().create(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -90,7 +91,7 @@ public class IndexDemo {
         DeleteIndexRequest request = new DeleteIndexRequest(index);
         try {
             DeleteIndexResponse response = ESClient.client.indices().delete(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +106,7 @@ public class IndexDemo {
         OpenIndexRequest request = new OpenIndexRequest(index);
         try {
             OpenIndexResponse response = ESClient.client.indices().open(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,7 +121,7 @@ public class IndexDemo {
         CloseIndexRequest request = new CloseIndexRequest(index);
         try {
             CloseIndexResponse response = ESClient.client.indices().close(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -137,12 +138,6 @@ public class IndexDemo {
 
 
 
-    /**
-     * 打印对象
-     * @param obj
-     */
-    public static void jsonPrint(Object obj){
-        System.out.println(JSONObject.fromObject(obj).toString());
-    }
+
 
 }

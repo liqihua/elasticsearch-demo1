@@ -32,7 +32,7 @@ public class IndexTest {
 
     @Test
     public void delete(){
-        String index = "index_cc";
+        String index = "index_sys_user";
         IndexDemo.delete(index);
     }
 
