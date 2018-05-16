@@ -15,6 +15,7 @@ import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.junit.Test;
 
@@ -55,6 +56,41 @@ public class IndexDemo {
         map.put("date_detection",true);
         map.put("dynamic_date_formats","yyyy-MM-dd HH:mm:ss");
         request.mapping(type,map);
+        try {
+            CreateIndexResponse response = ESClient.client.indices().create(request);
+            Tool.jsonPrint(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 创建mapping为nested父子嵌套结构的index
+     */
+    @Test
+    public void createWithNested(){
+        String index = "index_order";
+        String type = "order";
+        CreateIndexRequest request = new CreateIndexRequest(index);
+        String data = "{\"order\": {\n" +
+                "      \"properties\": {\n" +
+                "          \"order_no\":{\n" +
+                "          \"type\":\"text\"\n" +
+                "        },\n" +
+                "        \"comments\": {\n" +
+                "          \"type\": \"nested\", \n" +
+                "          \"properties\": {\n" +
+                "            \"name\":    { \"type\": \"text\"  },\n" +
+                "            \"comment\": { \"type\": \"text\"  },\n" +
+                "            \"age\":     { \"type\": \"short\"   },\n" +
+                "            \"stars\":   { \"type\": \"short\"   },\n" +
+                "            \"date\":    { \"type\": \"date\"    }\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }}";
+        request.mapping(type,data.toString(), XContentType.JSON);
         try {
             CreateIndexResponse response = ESClient.client.indices().create(request);
             Tool.jsonPrint(response);

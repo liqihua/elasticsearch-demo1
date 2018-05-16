@@ -1,5 +1,6 @@
 package com.liqihua.demo.client;
 
+import com.liqihua.utils.Tool;
 import net.sf.json.JSONObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -14,12 +15,12 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptType;
+import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author liqihua
@@ -40,11 +41,55 @@ public class DocumentDemo {
         request.source(doc);
         try {
             IndexResponse response = ESClient.client.index(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * 添加nested嵌套数据
+     */
+    @Test
+    public void addNested(){
+        String index = "index_order";
+        String type = "order";
+        String id = "1";
+        Map<String, Object> child1 = new HashMap<>();
+        Map<String, Object> child2 = new HashMap<>();
+        child1.put("name","John Smith");
+        child1.put("comment","Great article");
+        child1.put("age",28);
+        child1.put("stars",4);
+        child1.put("date","2014-09-01");
+
+        child2.put("name","Alice White");
+        child2.put("comment","More like this please");
+        child2.put("age",31);
+        child2.put("stars",5);
+        child2.put("date","2014-10-22");
+
+        List<Map<String, Object>> childList = new ArrayList<>();
+        childList.add(child1);
+        childList.add(child2);
+
+        Map<String, Object> doc = new HashMap<>();
+        doc.put("title","Nest eggs");
+        doc.put("body","Making your money work...");
+        doc.put("tags",new String[]{"cash","shares"});
+        doc.put("comments",childList);
+
+        IndexRequest request = new IndexRequest(index, type, id);
+        request.source(doc);
+        try {
+            IndexResponse response = ESClient.client.index(request);
+            Tool.jsonPrint(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /**
      * 获取记录
@@ -57,7 +102,7 @@ public class DocumentDemo {
         GetRequest request = new GetRequest(index,type,id);
         try {
             GetResponse response = ESClient.client.get(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
             return response;
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,7 +121,7 @@ public class DocumentDemo {
         DeleteRequest request = new DeleteRequest(index,type,id);
         try {
             DeleteResponse response = ESClient.client.delete(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +140,30 @@ public class DocumentDemo {
         request.doc(doc);
         try {
             UpdateResponse response = ESClient.client.update(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 通过脚本更新
+     * https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-document-update.html
+     */
+    @Test
+    public void updateByScript(){
+        String index = "index_article";
+        String type = "article";
+        String id = "2";
+        UpdateRequest request = new UpdateRequest(index,type,id);
+        Map<String,Object> param = new HashMap<>();
+        param.put("count",1);
+        Script script = new Script(ScriptType.INLINE, "painless", "ctx._source.comments[0].stars += params.count ", param);
+        request.script(script);
+        try {
+            UpdateResponse response = ESClient.client.update(request);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +186,7 @@ public class DocumentDemo {
         }
         try {
             BulkResponse response = ESClient.client.bulk(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -141,7 +209,7 @@ public class DocumentDemo {
         }
         try {
             BulkResponse response = ESClient.client.bulk(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -162,7 +230,7 @@ public class DocumentDemo {
         }
         try {
             BulkResponse response = ESClient.client.bulk(request);
-            jsonPrint(response);
+            Tool.jsonPrint(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -202,13 +270,7 @@ public class DocumentDemo {
 
 
 
-    /**
-     * 打印对象
-     * @param obj
-     */
-    public static void jsonPrint(Object obj){
-        System.out.println(JSONObject.fromObject(obj).toString());
-    }
+    
 
 
 }
