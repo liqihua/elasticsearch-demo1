@@ -428,6 +428,27 @@ public class Tool {
     }
 
 
+    /**
+     * 读取InputStream，返回String
+     * @param is
+     * @return
+     */
+    public static String InputStream2String(InputStream is) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String line = null;
+            StringBuilder sb = new StringBuilder();
+            while ((line = br.readLine()) != null) {
+                sb.append(line);
+            }
+            return sb.toString();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
 
     /**
      * 打印对象

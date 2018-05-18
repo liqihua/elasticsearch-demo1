@@ -32,9 +32,10 @@ public class IndexDemo {
 
     /**
      * 创建索引
-     * @param index
      */
-    public static void create(String index){
+    @Test
+    public void create(){
+        String index = "";
         CreateIndexRequest request = new CreateIndexRequest(index);
         try {
             CreateIndexResponse response = ESClient.client.indices().create(request);
@@ -47,9 +48,11 @@ public class IndexDemo {
 
     /**
      * 添加索引同时设置mapping
-     * @param index
      */
-    public static void createWithMapping(String index,String type){
+    @Test
+    public void createWithMapping(){
+        String index = "";
+        String type = "";
         CreateIndexRequest request = new CreateIndexRequest(index);
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("numeric_detection",true);
@@ -102,10 +105,11 @@ public class IndexDemo {
 
     /**
      * 创建同时设置别名
-     * @param index
-     * @param alias
      */
-    public static void createWithAlias(String index,String alias){
+    @Test
+    public void createWithAlias(){
+        String index = "";
+        String alias = "";
         CreateIndexRequest request = new CreateIndexRequest(index);
         request.alias(new Alias(alias));
         try {
@@ -121,9 +125,10 @@ public class IndexDemo {
 
     /**
      * 删除索引
-     * @param index
      */
-    public static void delete(String index){
+    @Test
+    public void delete(){
+        String index = "";
         DeleteIndexRequest request = new DeleteIndexRequest(index);
         try {
             DeleteIndexResponse response = ESClient.client.indices().delete(request);
@@ -136,9 +141,10 @@ public class IndexDemo {
 
     /**
      * 打开索引
-     * @param index
      */
-    public static void open(String index){
+    @Test
+    public static void open(){
+        String index = "";
         OpenIndexRequest request = new OpenIndexRequest(index);
         try {
             OpenIndexResponse response = ESClient.client.indices().open(request);
@@ -151,9 +157,10 @@ public class IndexDemo {
 
     /**
      * 关闭索引
-     * @param index
      */
-    public static void close(String index){
+    @Test
+    public void close(){
+        String index = "";
         CloseIndexRequest request = new CloseIndexRequest(index);
         try {
             CloseIndexResponse response = ESClient.client.indices().close(request);

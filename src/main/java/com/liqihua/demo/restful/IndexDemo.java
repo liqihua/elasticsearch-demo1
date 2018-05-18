@@ -4,6 +4,10 @@ import com.liqihua.config.ESConfig;
 import com.liqihua.utils.Tool;
 import net.sf.json.JSONObject;
 import org.junit.Test;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * @author liqihua
@@ -118,6 +122,23 @@ public class IndexDemo {
 
         Tool.put(data.toString(),url);
     }
+
+
+    /**
+     * 可以把mapping保存为一个json文件
+     */
+    @Test
+    public void readMappingFile(){
+        String location = "classpath:es/mapping.json";
+        try {
+            InputStream is = new PathMatchingResourcePatternResolver().getResource(location).getInputStream();
+            String json = Tool.InputStream2String(is);
+            System.out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     /**

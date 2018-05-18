@@ -31,12 +31,13 @@ public class DocumentDemo {
 
     /**
      * 添加记录
-     * @param index
-     * @param type
-     * @param id
-     * @param doc
      */
-    public static void add(String index, String type, String id, Map<String,Object> doc){
+    @Test
+    public void add(){
+        String index = "";
+        String type = "";
+        String id = "";
+        Map<String,Object> doc = null;
         IndexRequest request = new IndexRequest(index, type, id);
         request.source(doc);
         try {
@@ -93,12 +94,12 @@ public class DocumentDemo {
 
     /**
      * 获取记录
-     * @param index
-     * @param type
-     * @param id
-     * @return
      */
-    public static GetResponse get(String index,String type,String id){
+    @Test
+    public GetResponse get(){
+        String index = "";
+        String type = "";
+        String id = "";
         GetRequest request = new GetRequest(index,type,id);
         try {
             GetResponse response = ESClient.client.get(request);
@@ -113,11 +114,12 @@ public class DocumentDemo {
 
     /**
      * 删除记录
-     * @param index
-     * @param type
-     * @param id
      */
-    public static void delete(String index,String type,String id){
+    @Test
+    public void delete(){
+        String index = "";
+        String type = "";
+        String id = "";
         DeleteRequest request = new DeleteRequest(index,type,id);
         try {
             DeleteResponse response = ESClient.client.delete(request);
@@ -130,12 +132,13 @@ public class DocumentDemo {
 
     /**
      * 更新记录
-     * @param index
-     * @param type
-     * @param id
-     * @param doc
      */
-    public static void update(String index,String type,String id,Map<String,Object> doc){
+    @Test
+    public void update(){
+        String index = "";
+        String type = "";
+        String id = "";
+        Map<String,Object> doc = null;
         UpdateRequest request = new UpdateRequest(index,type,id);
         request.doc(doc);
         try {
@@ -172,12 +175,13 @@ public class DocumentDemo {
 
     /**
      * 批量添加
-     * @param index
-     * @param type
-     * @param IdStart
-     * @param IdEnd
      */
-    public static void bulkAdd(String index,String type,int IdStart,int IdEnd){
+    @Test
+    public static void bulkAdd(){
+        String index = "";
+        String type = "";
+        int IdStart = 0;
+        int IdEnd = 10;
         BulkRequest request = new BulkRequest();
         for(int i=IdStart; i<=IdEnd; i++){
             IndexRequest doc = new IndexRequest(index,type,i+"");
@@ -194,11 +198,12 @@ public class DocumentDemo {
 
     /**
      * 批量添加
-     * @param index
-     * @param type
-     * @param list
      */
-    public static void bulkAdd(String index,String type,List<Map<String,Object>> list){
+    @Test
+    public void bulkAddMap(){
+        String index = "";
+        String type = "";
+        List<Map<String,Object>> list = null;
         BulkRequest request = new BulkRequest();
         int id = 0;
         for(Map<String,Object> map : list){
@@ -215,14 +220,16 @@ public class DocumentDemo {
         }
     }
 
+
     /**
      * 批量删除
-     * @param index
-     * @param type
-     * @param IdStart
-     * @param IdEnd
      */
-    public static void bulkDelete(String index,String type,int IdStart,int IdEnd){
+    @Test
+    public static void bulkDelete(){
+        String index = "";
+        String type = "";
+        int IdStart = 0;
+        int IdEnd = 10;
         BulkRequest request = new BulkRequest();
         for(int i=IdStart; i<=IdEnd; i++){
             DeleteRequest doc = new DeleteRequest(index,type,i+"");
@@ -241,12 +248,13 @@ public class DocumentDemo {
 
     /**
      * 批量更新
-     * @param index
-     * @param type
-     * @param IdStart
-     * @param IdEnd
      */
-    public static void bulkUpdate(String index,String type,int IdStart,int IdEnd){
+    @Test
+    public void bulkUpdate(){
+        String index = "";
+        String type = "";
+        int IdStart = 0;
+        int IdEnd = 10;
         BulkRequest request = new BulkRequest();
         for(int i=IdStart; i<=IdEnd; i++){
             Map<String, Object> map = new HashMap<String, Object>();
