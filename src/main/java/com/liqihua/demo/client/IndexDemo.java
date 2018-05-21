@@ -143,7 +143,7 @@ public class IndexDemo {
      * 打开索引
      */
     @Test
-    public static void open(){
+    public void open(){
         String index = "";
         OpenIndexRequest request = new OpenIndexRequest(index);
         try {

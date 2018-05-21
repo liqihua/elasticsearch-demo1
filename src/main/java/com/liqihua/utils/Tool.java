@@ -4,6 +4,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -446,6 +447,21 @@ public class Tool {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    /**
+     * 读取配置文件内容
+     * @param path 如：classpath:xx/xx.json
+     */
+    public void readMappingFile(String path){
+        try {
+            InputStream is = new PathMatchingResourcePatternResolver().getResource(path).getInputStream();
+            String json = Tool.InputStream2String(is);
+            System.out.println(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
