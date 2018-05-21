@@ -10,6 +10,7 @@ import java.io.IOException;
 /**
  * @author liqihua
  * @since 2018/5/8
+ * 官方client的使用
  */
 public class ESClient {
     /**

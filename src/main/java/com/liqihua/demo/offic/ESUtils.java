@@ -1,10 +1,8 @@
-package com.liqihua.demo.main;
+package com.liqihua.demo.offic;
 
 import com.liqihua.config.ESConfig;
 import com.liqihua.demo.client.ESClient;
 import com.liqihua.utils.Tool;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
@@ -14,7 +12,6 @@ import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
 import org.elasticsearch.action.admin.indices.open.OpenIndexResponse;
-import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -27,17 +24,11 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.junit.Test;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
@@ -52,7 +43,7 @@ public class ESUtils {
      * GET http://ip:port/_cat/indices?v
      * @return
      */
-    public String indexList(){
+    public static String indexList(){
         String url = ESConfig.URL+"/_cat/indices?v";
         return Tool.get(url);
     }
@@ -66,7 +57,7 @@ public class ESUtils {
      * @param alias 别名
      * @return
      */
-    public String createIndex(String index,String type,Map<String,Object> mapping,String alias){
+    public static String createIndex(String index,String type,Map<String,Object> mapping,String alias){
         if(Tool.isNotBlank(index)){
             if(Tool.isBlank(type)){
                 type = index;
@@ -101,7 +92,7 @@ public class ESUtils {
      * @param alias 别名
      * @return
      */
-    public String createIndex(String index,String type,String mapping,String alias){
+    public static String createIndex(String index,String type,String mapping,String alias){
         if(Tool.isNotBlank(index)){
             if(Tool.isBlank(type)){
                 type = index;
@@ -135,7 +126,7 @@ public class ESUtils {
      * @param index
      * @return
      */
-    public String deleteIndex(String index){
+    public static String deleteIndex(String index){
         DeleteIndexRequest request = new DeleteIndexRequest(index);
         try {
             DeleteIndexResponse response = ESClient.client.indices().delete(request);
@@ -153,7 +144,7 @@ public class ESUtils {
      * @param index
      * @return
      */
-    public String openIndex(String index){
+    public static String openIndex(String index){
         OpenIndexRequest request = new OpenIndexRequest(index);
         try {
             OpenIndexResponse response = ESClient.client.indices().open(request);
@@ -169,7 +160,7 @@ public class ESUtils {
      * 关闭索引
      * @param index
      */
-    public String closeIndex(String index){
+    public static String closeIndex(String index){
         CloseIndexRequest request = new CloseIndexRequest(index);
         try {
             CloseIndexResponse response = ESClient.client.indices().close(request);
@@ -191,7 +182,7 @@ public class ESUtils {
      * @param destIndex 新索引
      * @return
      */
-    public String reIndex(String sourceIndex,String destIndex){
+    public static String reIndex(String sourceIndex,String destIndex){
         String json = "{\n" +
                 "\t\"source\": {\n" +
                 "\t\t\"index\": \""+sourceIndex+"\"\n" +
@@ -213,7 +204,7 @@ public class ESUtils {
      * @param index
      * @return
      */
-    public boolean indexExist(String index){
+    public static boolean indexExist(String index){
         String url = ESConfig.URL + "/" + index;
         int code = Tool.head(url);
         if(200 == code){
@@ -232,7 +223,7 @@ public class ESUtils {
      * @param type
      * @return
      */
-    public boolean typeExist(String index,String type){
+    public static boolean typeExist(String index,String type){
         String url = ESConfig.URL + "/" + index + "/_mapping/" + type;
         int code = Tool.head(url);
         if(200 == code){
@@ -251,7 +242,7 @@ public class ESUtils {
      * @param type
      * @param json 如：{"properties":{"age":{"type":"double"}}}
      */
-    public String setMapping(String index,String type,String json){
+    public static String setMapping(String index,String type,String json){
         String url = ESConfig.URL + "/" + index + "/_mapping/" + type;
         return Tool.put(json.toString(),url);
     }
@@ -264,7 +255,7 @@ public class ESUtils {
      * @param type
      * @return
      */
-    public String getTypeMapping(String index,String type){
+    public static String getTypeMapping(String index,String type){
         String url = ESConfig.URL + "/" + index + "/_mapping/" + type;
         return Tool.get(url);
     }
@@ -278,7 +269,7 @@ public class ESUtils {
      * @param field 字段名
      * @return
      */
-    public String getFieldMapping(String index,String type,String field){
+    public static String getFieldMapping(String index,String type,String field){
         String url = ESConfig.URL + "/" + index + "/_mapping/" + type + "/field/" + field;
         return Tool.get(url);
     }
@@ -292,7 +283,7 @@ public class ESUtils {
      * @param alias 别名
      * @param json 如：{"actions":[{"add":{"index":"index_aa","alias":"index_1"}}]}
      */
-    public String addAlias(String index,String alias,String json){
+    public static String addAlias(String index,String alias,String json){
         String url = ESConfig.URL + "/_aliases";
         return Tool.post(json,url);
     }
@@ -305,7 +296,7 @@ public class ESUtils {
      * @param json 如：{"actions":[{"remove":{"index":"index_aa","alias":"index_1"}}]}
      * @return
      */
-    public String removeAlias(String index,String alias,String json){
+    public static String removeAlias(String index,String alias,String json){
         String url = ESConfig.URL + "/_aliases";
         return Tool.post(json,url);
     }
@@ -317,7 +308,7 @@ public class ESUtils {
      * @param index
      * @return
      */
-    public String getAlias(String index){
+    public static String getAlias(String index){
         String url = ESConfig.URL + "/"+ index +"/_alias" ;
         return Tool.get(url);
     }
@@ -331,7 +322,7 @@ public class ESUtils {
      * @param doc
      * @return
      */
-    public IndexResponse addDoc(String index,String type,String id,Map<String,Object> doc){
+    public static IndexResponse addDoc(String index,String type,String id,Map<String,Object> doc){
         IndexRequest request = new IndexRequest(index, type, id);
         request.source(doc);
         try {
@@ -352,7 +343,7 @@ public class ESUtils {
      * @param id
      * @return
      */
-    public GetResponse getDoc(String index,String type,String id){
+    public static GetResponse getDoc(String index,String type,String id){
         GetRequest request = new GetRequest(index,type,id);
         try {
             GetResponse response = ESClient.client.get(request);
@@ -372,7 +363,7 @@ public class ESUtils {
      * @param id
      * @return
      */
-    public DeleteResponse deleteDoc(String index,String type,String id){
+    public static DeleteResponse deleteDoc(String index,String type,String id){
         DeleteRequest request = new DeleteRequest(index,type,id);
         try {
             DeleteResponse response = ESClient.client.delete(request);
@@ -392,7 +383,7 @@ public class ESUtils {
      * @param id
      * @return
      */
-    public UpdateResponse updateDoc(String index,String type,String id){
+    public static UpdateResponse updateDoc(String index,String type,String id){
         Map<String,Object> doc = null;
         UpdateRequest request = new UpdateRequest(index,type,id);
         request.doc(doc);
@@ -416,7 +407,7 @@ public class ESUtils {
      * @param script
      * @return
      */
-    public UpdateResponse updateDocByScript(String index,String type,String id,Script script){
+    public static UpdateResponse updateDocByScript(String index,String type,String id,Script script){
         UpdateRequest request = new UpdateRequest(index,type,id);
         //Map<String,Object> param = new HashMap<>();
         //param.put("count",1);
@@ -440,7 +431,7 @@ public class ESUtils {
      * @param docList 每个Map必须包含一个key为id
      * @return
      */
-    public BulkResponse bulkAddDoc(String index,String type,List<Map<String,Object>> docList){
+    public static BulkResponse bulkAddDoc(String index,String type,List<Map<String,Object>> docList){
         BulkRequest request = new BulkRequest();
         docList.forEach(doc -> {
             request.add(new IndexRequest(index,type,doc.get("id")+""));
@@ -463,7 +454,7 @@ public class ESUtils {
      * @param idList
      * @return
      */
-    public BulkResponse bulkDeleteDoc(String index,String type,List<String> idList){
+    public static BulkResponse bulkDeleteDoc(String index,String type,List<String> idList){
         BulkRequest request = new BulkRequest();
         idList.forEach(id -> {
             request.add(new DeleteRequest(index,type,id));
@@ -486,7 +477,7 @@ public class ESUtils {
      * @param docList
      * @return
      */
-    public BulkResponse bulkUpdateDoc(String index,String type,List<Map<String,Object>> docList){
+    public static BulkResponse bulkUpdateDoc(String index,String type,List<Map<String,Object>> docList){
         BulkRequest request = new BulkRequest();
         docList.forEach(doc -> {
             request.add(new UpdateRequest(index,type,doc.get("id")+""));
@@ -510,7 +501,7 @@ public class ESUtils {
      * @param id
      * @return
      */
-    public boolean docExist(String index,String type,String id){
+    public static boolean docExist(String index,String type,String id){
         String url = ESConfig.URL + "/" + index + "/" + type + "/" + id;
         int code = Tool.head(url);
         if(200 == code){
@@ -527,7 +518,7 @@ public class ESUtils {
      * @param type
      * @return
      */
-    public SearchResponse matchAll(String index,String type){
+    public static SearchResponse matchAll(String index,String type){
         SearchRequest request = new SearchRequest();
         if(Tool.isNotBlank(index)){
             request.indices(index);
